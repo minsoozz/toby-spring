@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  toby:
+    image: mariadb10.3:v1
+    container_name: toby-spring-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db-data/:/var/lib/mysql
+      - ./config/mariadb/custom.cnf:/etc/mysql/mariadb.conf.d/custom.cnf
+      - ./config/dbdata:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: minsoo
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: springbook
+      TZ: Asia/Seoul
