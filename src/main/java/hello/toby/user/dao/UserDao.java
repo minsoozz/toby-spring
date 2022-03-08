@@ -2,17 +2,15 @@ package hello.toby.user.dao;
 
 import hello.toby.user.domain.User;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDao {
+public abstract class UserDao {
 
   public void add(User user) throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
-    Connection c = DriverManager.getConnection(
-        "jdbc:mysql://localhost/springbook", "root", "1234");
+    Connection c = getConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "insert into users(id,name,password) values(?,?,?)");
@@ -28,8 +26,7 @@ public class UserDao {
 
   public User get(String id) throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
-    Connection c = DriverManager.getConnection(
-        "jdbc:mysql://localhost/springbook", "root", "1234");
+    Connection c = getConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "select * from users where id = ?");
@@ -49,6 +46,27 @@ public class UserDao {
 
     return user;
   }
+
+  public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
+
+  public class NUserDao extends UserDao {
+
+    @Override
+    public Connection getConnection() throws ClassNotFoundException, SQLException {
+      // N사 DB connection 생성코드
+      return null;
+    }
+  }
+
+  public class DUserDao extends UserDao {
+
+    @Override
+    public Connection getConnection() throws ClassNotFoundException, SQLException {
+      // D사 DB connection 생성코드
+      return null;
+    }
+  }
+
 
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
     UserDao dao = new UserDao();
