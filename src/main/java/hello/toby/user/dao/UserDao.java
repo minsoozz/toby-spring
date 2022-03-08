@@ -6,11 +6,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class UserDao {
+public class UserDao {
+
+  private ConnectionMaker connectionMaker;
+
+  public UserDao(ConnectionMaker connectionMaker) {
+    this.connectionMaker = connectionMaker;
+  }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
-    Connection c = getConnection();
+    Connection c = connectionMaker.makeConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "insert into users(id,name,password) values(?,?,?)");
@@ -26,7 +32,7 @@ public abstract class UserDao {
 
   public User get(String id) throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
-    Connection c = getConnection();
+    Connection c = connectionMaker.makeConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "select * from users where id = ?");
@@ -47,29 +53,10 @@ public abstract class UserDao {
     return user;
   }
 
-  public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
-
-  public class NUserDao extends UserDao {
-
-    @Override
-    public Connection getConnection() throws ClassNotFoundException, SQLException {
-      // N사 DB connection 생성코드
-      return null;
-    }
-  }
-
-  public class DUserDao extends UserDao {
-
-    @Override
-    public Connection getConnection() throws ClassNotFoundException, SQLException {
-      // D사 DB connection 생성코드
-      return null;
-    }
-  }
-
-
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
-    UserDao dao = new UserDao();
+    ConnectionMaker connectionMaker = new DConnectionMaker();
+
+    UserDao dao = new UserDao(connectionMaker);
 
     User user = new User();
     user.setId("minsoo");
