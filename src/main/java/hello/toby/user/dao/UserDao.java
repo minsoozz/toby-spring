@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class UserDao {
 
@@ -55,7 +57,8 @@ public class UserDao {
 
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
 
-    UserDao dao = new DaoFactory().userDao();
+    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+    UserDao dao = context.getBean("userDao", UserDao.class);
     User user = new User();
     user.setId("minsoo");
     user.setName("김민수");
