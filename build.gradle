@@ -18,6 +18,9 @@ dependencies {
 
 	/* mysql 연동 */
 	implementation 'mysql:mysql-connector-java'
+
+	/* dataSource */
+	implementation group: 'org.springframework', name: 'spring-jdbc', version: '3.2.3.RELEASE'
 }
 
 tasks.named('test') {

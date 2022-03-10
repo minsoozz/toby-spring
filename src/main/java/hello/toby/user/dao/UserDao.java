@@ -5,22 +5,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class UserDao {
 
-  private ConnectionMaker connectionMaker;
-  private Connection c;
-  private User user;
+  private DataSource dataSource;
 
-  public void setConnectionMaker(ConnectionMaker connectionMaker) {
-    this.connectionMaker = connectionMaker;
+  public UserDao(DataSource dataSource) {
+    this.dataSource = dataSource;
   }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
-    Connection c = connectionMaker.makeConnection();
+    Connection c = dataSource.getConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "insert into users(id,name,password) values(?,?,?)");
@@ -36,7 +35,7 @@ public class UserDao {
 
   public User get(String id) throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
-    this.c = connectionMaker.makeConnection();
+    this.c = dataSource.getConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "select * from users where id = ?");
