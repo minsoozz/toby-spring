@@ -7,10 +7,20 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DaoFactory.class)
 class UserDaoTest {
+
+  @Autowired
+  private ApplicationContext context;
 
   private UserDao dao;
   private User user1;
@@ -19,10 +29,10 @@ class UserDaoTest {
 
   @BeforeEach
   void setUp() {
-
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-        DaoFactory.class);
     this.dao = context.getBean("userDao", UserDao.class);
+
+    System.out.println("this.context = " + this.context);
+    System.out.println("this = " + this);
 
     this.user1 = new User("minsoo1", "일민수", "1");
     this.user2 = new User("minsoo2", "이민수", "2");
