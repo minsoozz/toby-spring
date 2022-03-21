@@ -4,35 +4,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import hello.toby.user.domain.User;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DaoFactory.class)
 class UserDaoTest {
 
-  @Autowired
-  private ApplicationContext context;
-
   private UserDao dao;
+
   private User user1;
   private User user2;
   private User user3;
 
   @BeforeEach
   void setUp() {
-    this.dao = context.getBean("userDao", UserDao.class);
 
-    System.out.println("this.context = " + this.context);
-    System.out.println("this = " + this);
+    dao = new UserDao();
+
+    DataSource dataSource = new SingleConnectionDataSource(
+        "jdbc:mysql://localhost/springbook", "root", "1234", true);
+
+    dao.setDataSource(dataSource);
 
     this.user1 = new User("minsoo1", "일민수", "1");
     this.user2 = new User("minsoo2", "이민수", "2");

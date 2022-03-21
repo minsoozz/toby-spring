@@ -10,7 +10,7 @@ public class DaoFactory {
 
   @Bean
   public UserDao userDao() throws ClassNotFoundException {
-    UserDao userDao = new UserDao(dataSource());
+    UserDao userDao = new UserDao();
     return userDao;
   }
 
