@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-public abstract class UserDao {
+public class UserDao {
 
   private DataSource dataSource;
 
@@ -65,7 +65,42 @@ public abstract class UserDao {
     return user;
   }
 
-  abstract protected PreparedStatement makeStatement(Connection c) throws SQLException;
+  public void deleteAll() throws SQLException {
+    Connection c = null;
+    PreparedStatement ps = null;
+
+    try {
+      c = dataSource.getConnection();
+
+      StatementStrategy statementStrategy = new DeleteAllStatement();
+      ps = statementStrategy.makePreparedStatement(c);
+
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      throw e;
+    } finally {
+      if (ps != null) {
+        try {
+          ps.close();
+        } catch (SQLException e) {
+          c.close();
+        }
+        if (c != null) {
+          try {
+            c.close();
+          } catch (SQLException e) {
+
+          }
+        }
+      }
+    }
+  }
+
+  private PreparedStatement makeStatement(Connection c) throws SQLException {
+    PreparedStatement ps;
+    ps = c.prepareStatement("delete from users");
+    return ps;
+  }
 
   public int getCount() throws SQLException {
     Connection c = null;
