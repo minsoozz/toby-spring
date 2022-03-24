@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-public class UserDao {
+public abstract class UserDao {
 
   private DataSource dataSource;
 
@@ -65,41 +65,7 @@ public class UserDao {
     return user;
   }
 
-  public void deleteAll() throws SQLException {
-    Connection c = null;
-    PreparedStatement ps = null;
-
-    try {
-      c = dataSource.getConnection();
-
-      ps = makeStatement(c); // 변하는 부분을 메소드로 추출하고 변하지 않는 부분에서 호출하도록 만들었다.
-
-      ps.executeUpdate();
-    } catch (SQLException e) {
-      throw e;
-    } finally {
-      if (ps != null) {
-        try {
-          ps.close();
-        } catch (SQLException e) {
-          c.close();
-        }
-        if (c != null) {
-          try {
-            c.close();
-          } catch (SQLException e) {
-
-          }
-        }
-      }
-    }
-  }
-
-  private PreparedStatement makeStatement(Connection c) throws SQLException {
-    PreparedStatement ps;
-    ps = c.prepareStatement("delete from users");
-    return ps;
-  }
+  abstract protected PreparedStatement makeStatement(Connection c) throws SQLException;
 
   public int getCount() throws SQLException {
     Connection c = null;
