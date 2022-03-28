@@ -11,8 +11,16 @@ public class DaoFactory {
   @Bean
   public UserDao userDao() throws ClassNotFoundException {
     UserDao userDao = new UserDao();
+    userDao.setDataSource(dataSource());
     return userDao;
   }
+
+ /* @Bean
+  public JdbcContext jdbcContext() throws ClassNotFoundException {
+    JdbcContext jdbcContext = new JdbcContext();
+    jdbcContext.setDataSource(dataSource());
+    return jdbcContext;
+  }*/
 
   @Bean
   public ConnectionMaker connectionMaker() {
