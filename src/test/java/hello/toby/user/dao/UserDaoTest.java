@@ -4,15 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import hello.toby.user.domain.User;
 import java.sql.SQLException;
+import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 class UserDaoTest {
 
@@ -80,5 +78,36 @@ class UserDaoTest {
 
     Assertions.assertThrows(EmptyResultDataAccessException.class, () -> dao.get("unknown_id"));
 
+  }
+
+  @Test
+  void getAll() throws SQLException {
+    dao.deleteAll();
+
+    List<User> user0 = dao.getAll();
+    assertThat(user0.size()).isEqualTo(0);
+
+    dao.add(user1);
+    List<User> users1 = dao.getAll();
+    assertThat(users1.size()).isEqualTo(1);
+    checkSameUser(user1, users1.get(0));
+
+    dao.add(user2);
+    List<User> users2 = dao.getAll();
+    assertThat(users2.size()).isEqualTo(1);
+    checkSameUser(user1, users2.get(0));
+    checkSameUser(user2, users2.get(1));
+
+    dao.add(user3);
+    List<User> users3 = dao.getAll();
+    assertThat(users3.size()).isEqualTo(3);
+    checkSameUser(user1, users2.get(1));
+    checkSameUser(user2, users2.get(2));
+  }
+
+  private void checkSameUser(User user1, User user) {
+    assertThat(user1.getId()).isEqualTo(user2.getId());
+    assertThat(user1.getName()).isEqualTo(user2.getName());
+    assertThat(user1.getPassword()).isEqualTo(user2.getPassword());
   }
 }
