@@ -1,6 +1,8 @@
 package hello.toby.user.dao;
 
+import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import hello.toby.user.domain.User;
+import hello.toby.exception.DuplicateUserIdException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +29,19 @@ public class UserDao {
   public void setDataSource(DataSource dataSource) {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
     this.dataSource = dataSource;
+  }
+
+  public void add() throws DuplicateUserIdException {
+    try {
+      // JDBC를 이용해 user 정보를 DB에 추가하는 코드 또는
+      // 그런 기능 있는 다른 SQLException을 던지는 메소드를 호출하는 코드
+      add(null);
+    } catch (SQLException e) {
+      if (e.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+        throw new DuplicateUserIdException(e);
+      } else
+        throw new RuntimeException(e);
+    }
   }
 
   public void add(final User user) throws SQLException {
