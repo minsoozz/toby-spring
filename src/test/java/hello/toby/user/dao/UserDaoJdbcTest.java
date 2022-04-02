@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
-class UserDaoTest {
+class UserDaoJdbcTest {
 
-  private UserDao dao;
+  private UserDaoJdbc dao;
 
   private User user1;
   private User user2;
@@ -23,7 +23,7 @@ class UserDaoTest {
   @BeforeEach
   void setUp() {
 
-    dao = new UserDao();
+    dao = new UserDaoJdbc();
 
     DataSource dataSource = new SingleConnectionDataSource(
         "jdbc:mysql://localhost/springbook", "root", "1234", true);

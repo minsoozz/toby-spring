@@ -9,10 +9,10 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 public class DaoFactory {
 
   @Bean
-  public UserDao userDao() throws ClassNotFoundException {
-    UserDao userDao = new UserDao();
-    userDao.setDataSource(dataSource());
-    return userDao;
+  public UserDaoJdbc userDao() throws ClassNotFoundException {
+    UserDaoJdbc userDaoJdbc = new UserDaoJdbc();
+    userDaoJdbc.setDataSource(dataSource());
+    return userDaoJdbc;
   }
 
  /* @Bean
