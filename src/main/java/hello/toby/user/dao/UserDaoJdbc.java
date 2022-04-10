@@ -1,8 +1,9 @@
 package hello.toby.user.dao;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
-import hello.toby.user.domain.User;
 import hello.toby.exception.DuplicateUserIdException;
+import hello.toby.user.domain.Level;
+import hello.toby.user.domain.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +18,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
-public class UserDaoJdbc implements UserDao{
+public class UserDaoJdbc implements UserDao {
 
   private JdbcTemplate jdbcTemplate;
 
@@ -31,6 +32,11 @@ public class UserDaoJdbc implements UserDao{
     this.dataSource = dataSource;
   }
 
+  public void setJdbcContext(JdbcContext jdbcContext) {
+    jdbcContext.setDataSource(dataSource);
+    this.jdbcContext = jdbcContext;
+  }
+
   public void add() throws DuplicateUserIdException {
     try {
       // JDBC를 이용해 user 정보를 DB에 추가하는 코드 또는
@@ -39,8 +45,9 @@ public class UserDaoJdbc implements UserDao{
     } catch (SQLException e) {
       if (e.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
         throw new DuplicateUserIdException(e);
-      } else
+      } else {
         throw new RuntimeException(e);
+      }
     }
   }
 
@@ -49,10 +56,14 @@ public class UserDaoJdbc implements UserDao{
     jdbcContext.workWithStatementStrategy(new StatementStrategy() {
 
                                             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                                              PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+                                              PreparedStatement ps = c.prepareStatement(
+                                                  "insert into users(id, name, password,level,login,recommend) values(?,?,?,?,?,?)");
                                               ps.setString(1, user.getId());
                                               ps.setString(2, user.getName());
                                               ps.setString(3, user.getPassword());
+                                              ps.setInt(4, user.getLevel().intValue());
+                                              ps.setInt(5, user.getLogin());
+                                              ps.setInt(6, user.getRecommend());
 
                                               return ps;
                                             }
@@ -62,7 +73,7 @@ public class UserDaoJdbc implements UserDao{
 
   @Override
   public User get(String id) throws ClassNotFoundException, SQLException {
-    return this.jdbcTemplate.queryForObject("select * from user where id = ?",
+    return this.jdbcTemplate.queryForObject("select * from users where id = ?",
         new Object[]{id},
         new RowMapper<User>() {
           @Override
@@ -71,6 +82,10 @@ public class UserDaoJdbc implements UserDao{
             user.setId(rs.getString("id"));
             user.setName(rs.getString("name"));
             user.setPassword(rs.getString("password"));
+            user.setLevel(Level.valueOf(rs.getInt("level")));
+            user.setLogin(rs.getInt("login"));
+            user.setRecommend(rs.getInt("recommend"));
+            System.out.println("user = " + user.getId());
             return user;
           }
         }
@@ -97,6 +112,13 @@ public class UserDaoJdbc implements UserDao{
         return rs.getInt(1);
       }
     });
+  }
+
+  @Override
+  public void update(User user) {
+    this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?, " +
+            "recommend = ? where id = ?", user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(),
+        user.getRecommend(), user.getId());
   }
 
   @Override

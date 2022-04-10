@@ -1,5 +1,6 @@
 package hello.toby.user.dao;
 
+import hello.toby.user.service.UserService;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +16,19 @@ public class DaoFactory {
     return userDaoJdbc;
   }
 
- /* @Bean
+  @Bean
+  public UserService userService() throws ClassNotFoundException {
+    UserService userService = new UserService();
+    userService.setUserDao(userDao());
+    return userService;
+  }
+
+  @Bean
   public JdbcContext jdbcContext() throws ClassNotFoundException {
     JdbcContext jdbcContext = new JdbcContext();
     jdbcContext.setDataSource(dataSource());
     return jdbcContext;
-  }*/
+  }
 
   @Bean
   public ConnectionMaker connectionMaker() {

@@ -2,6 +2,7 @@ package hello.toby.user.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hello.toby.user.domain.Level;
 import hello.toby.user.domain.User;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,14 +26,19 @@ class UserDaoJdbcTest {
 
     dao = new UserDaoJdbc();
 
+
     DataSource dataSource = new SingleConnectionDataSource(
         "jdbc:mysql://localhost/springbook", "root", "1234", true);
 
-    dao.setDataSource(dataSource);
+    JdbcContext jdbcContext = new JdbcContext();
+    jdbcContext.setDataSource(dataSource);
 
-    this.user1 = new User("minsoo1", "일민수", "1");
-    this.user2 = new User("minsoo2", "이민수", "2");
-    this.user3 = new User("minsoo3", "삼민수", "3");
+    dao.setDataSource(dataSource);
+    dao.setJdbcContext(jdbcContext);
+
+    this.user1 = new User("minsoo1", "일민수", "1", Level.BASIC, 1, 0);
+    this.user2 = new User("minsoo2", "이민수", "2", Level.SILVER, 55, 10);
+    this.user3 = new User("minsoo3", "삼민수", "3", Level.GOLD, 100, 40);
   }
 
   @Test
@@ -105,9 +111,34 @@ class UserDaoJdbcTest {
     checkSameUser(user2, users2.get(2));
   }
 
-  private void checkSameUser(User user1, User user) {
+  private void checkSameUser(User user1, User user2) {
     assertThat(user1.getId()).isEqualTo(user2.getId());
     assertThat(user1.getName()).isEqualTo(user2.getName());
     assertThat(user1.getPassword()).isEqualTo(user2.getPassword());
+    assertThat(user1.getLevel()).isEqualTo(user2.getLevel());
+    assertThat(user1.getLogin()).isEqualTo(user2.getLogin());
+    assertThat(user1.getRecommend()).isEqualTo(user2.getRecommend());
+  }
+
+  @Test
+  public void update() throws SQLException, ClassNotFoundException {
+    dao.deleteAll();
+
+    dao.add(user1);
+    dao.add(user2);
+
+    user1.setName("김민수");
+    user1.setPassword("spring");
+    user1.setLevel(Level.GOLD);
+    user1.setLogin(1000);
+    user1.setRecommend(999);
+
+    dao.update(user1);
+
+    User user1update = dao.get(user1.getId());
+    checkSameUser(user1, user1update);
+
+    User user2update = dao.get(user2.getId());
+    checkSameUser(user2, user2update);
   }
 }
