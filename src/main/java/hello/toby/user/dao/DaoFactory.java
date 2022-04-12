@@ -1,11 +1,13 @@
 package hello.toby.user.dao;
 
+import hello.toby.mail.DummyMailSender;
 import hello.toby.user.service.UserService;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.mail.MailSender;
 
 @Configuration
 public class DaoFactory {
@@ -56,5 +58,10 @@ public class DaoFactory {
     DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
     dataSourceTransactionManager.setDataSource(dataSource());
     return dataSourceTransactionManager;
+  }
+
+  @Bean
+  public MailSender mailSender() {
+    return new DummyMailSender();
   }
 }

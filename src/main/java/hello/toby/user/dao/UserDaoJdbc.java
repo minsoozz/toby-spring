@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -57,13 +56,14 @@ public class UserDaoJdbc implements UserDao {
 
                                             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                                               PreparedStatement ps = c.prepareStatement(
-                                                  "insert into users(id, name, password,level,login,recommend) values(?,?,?,?,?,?)");
+                                                  "insert into users(id, name, password,level,login,recommend,email) values(?,?,?,?,?,?,?)");
                                               ps.setString(1, user.getId());
                                               ps.setString(2, user.getName());
                                               ps.setString(3, user.getPassword());
                                               ps.setInt(4, user.getLevel().intValue());
                                               ps.setInt(5, user.getLogin());
                                               ps.setInt(6, user.getRecommend());
+                                              ps.setString(7, user.getEmail());
 
                                               return ps;
                                             }
@@ -117,8 +117,9 @@ public class UserDaoJdbc implements UserDao {
   @Override
   public void update(User user) {
     this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?, " +
-            "recommend = ? where id = ?", user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(),
-        user.getRecommend(), user.getId());
+            "recommend = ?, email = ? where id = ?", user.getName(), user.getPassword(), user.getLevel().intValue(),
+        user.getLogin(),
+        user.getRecommend(), user.getId(), user.getEmail());
   }
 
   @Override
