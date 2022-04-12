@@ -20,6 +20,7 @@ public class DaoFactory {
   public UserService userService() throws ClassNotFoundException {
     UserService userService = new UserService();
     userService.setUserDao(userDao());
+    userService.setDataSource(dataSource());
     return userService;
   }
 

@@ -6,14 +6,17 @@ import static hello.toby.user.domain.Level.SILVER;
 import static hello.toby.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static hello.toby.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import hello.toby.user.dao.DaoFactory;
 import hello.toby.user.dao.UserDao;
-import hello.toby.user.domain.Level;
 import hello.toby.user.domain.User;
+import hello.toby.user.service.UserService.TestUserService;
+import hello.toby.user.service.UserService.TestUserServiceException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +34,9 @@ public class UserServiceTest {
   @Autowired
   UserDao userDao;
 
+  @Autowired
+  DataSource dataSource;
+
   List<User> users;
 
   @Test
@@ -41,16 +47,16 @@ public class UserServiceTest {
   @BeforeEach
   void setUp() {
     users = Arrays.asList(
-        new User("minsoo1", "일민수", "1", BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
+        new User("minsoo1", "일민수", "1", BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
         new User("minsoo2", "이민수", "2", BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-        new User("minsoo3", "삼민수", "3", SILVER, 60, MIN_RECOMMEND_FOR_GOLD-1),
+        new User("minsoo3", "삼민수", "3", SILVER, 60, MIN_RECOMMEND_FOR_GOLD - 1),
         new User("minsoo4", "삼민수", "3", SILVER, 60, MIN_RECOMMEND_FOR_GOLD),
         new User("minsoo5", "삼민수", "3", GOLD, 100, Integer.MAX_VALUE)
     );
   }
 
   @Test
-  void upgradeLevels() throws SQLException, ClassNotFoundException {
+  void upgradeLevels() throws Exception {
     userDao.deleteAll();
     for (User user : users) {
       try {
@@ -71,7 +77,7 @@ public class UserServiceTest {
 
   private void checkLevelUpgraded(User user, boolean upgraded) throws SQLException, ClassNotFoundException {
     User userUpdate = userDao.get(user.getId());
-    if(upgraded){
+    if (upgraded) {
       assertThat(userUpdate.getLevel()).isEqualTo(user.getLevel().nextLevel());
     } else {
       assertThat(userUpdate.getLevel()).isEqualTo(user.getLevel());
@@ -94,6 +100,24 @@ public class UserServiceTest {
 
     assertThat(userWithLevelRead.getLevel()).isEqualTo(userWithLevel.getLevel());
     assertThat(userWithoutLevelRead.getLevel()).isEqualTo(BASIC);
+  }
 
+  @Test
+  void upgradeAllOrNothing() throws Exception {
+    UserService testUserService = new TestUserService(users.get(3).getId());
+    testUserService.setUserDao(this.userDao); // userDao를 수동 DI 해준다
+    testUserService.setDataSource(this.dataSource);
+    userDao.deleteAll();
+    for (User user : users) {
+      userDao.add(user);
+    }
+
+    try {
+      testUserService.upgradeLevels();
+      fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+
+    }
+    checkLevelUpgraded(users.get(1), false);
   }
 }
