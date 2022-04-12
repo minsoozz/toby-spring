@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -22,6 +23,7 @@ public class UserDaoJdbc implements UserDao {
 
   private JdbcTemplate jdbcTemplate;
 
+  @Autowired
   private JdbcContext jdbcContext;
 
   private DataSource dataSource;
@@ -32,10 +34,6 @@ public class UserDaoJdbc implements UserDao {
     this.dataSource = dataSource;
   }
 
-  public void setJdbcContext(JdbcContext jdbcContext) {
-    jdbcContext.setDataSource(dataSource);
-    this.jdbcContext = jdbcContext;
-  }
 
   public void add() throws DuplicateUserIdException {
     try {
@@ -131,6 +129,9 @@ public class UserDaoJdbc implements UserDao {
             user.setId(rs.getString("id"));
             user.setName(rs.getString("name"));
             user.setPassword(rs.getString("password"));
+            user.setLevel(Level.valueOf(rs.getInt("level"))); // 추가
+            user.setLogin(rs.getInt("login")); // 추가
+            user.setRecommend(rs.getInt("recommend")); // 추가
             return user;
           }
         });
