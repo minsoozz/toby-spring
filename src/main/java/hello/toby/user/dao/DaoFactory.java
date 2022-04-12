@@ -4,6 +4,7 @@ import hello.toby.user.service.UserService;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 @Configuration
@@ -13,6 +14,7 @@ public class DaoFactory {
   public UserDaoJdbc userDao() throws ClassNotFoundException {
     UserDaoJdbc userDaoJdbc = new UserDaoJdbc();
     userDaoJdbc.setDataSource(dataSource());
+    userDaoJdbc.setJdbcContext(jdbcContext());
     return userDaoJdbc;
   }
 
@@ -47,5 +49,12 @@ public class DaoFactory {
     simpleDriverDataSource.setUsername("root");
     simpleDriverDataSource.setPassword("1234");
     return simpleDriverDataSource;
+  }
+
+  @Bean
+  public DataSourceTransactionManager transactionManager() throws ClassNotFoundException {
+    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+    dataSourceTransactionManager.setDataSource(dataSource());
+    return dataSourceTransactionManager;
   }
 }

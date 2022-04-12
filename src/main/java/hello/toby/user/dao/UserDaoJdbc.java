@@ -23,11 +23,13 @@ public class UserDaoJdbc implements UserDao {
 
   private JdbcTemplate jdbcTemplate;
 
-  @Autowired
   private JdbcContext jdbcContext;
 
   private DataSource dataSource;
 
+  public void setJdbcContext(JdbcContext jdbcContext) {
+    this.jdbcContext = jdbcContext;
+  }
 
   public void setDataSource(DataSource dataSource) {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
