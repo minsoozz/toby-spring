@@ -1,7 +1,8 @@
 package hello.toby.user.dao;
 
 import hello.toby.mail.DummyMailSender;
-import hello.toby.user.service.UserService;
+import hello.toby.user.service.UserServiceImpl;
+import hello.toby.user.service.UserServiceTx;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +22,18 @@ public class DaoFactory {
   }
 
   @Bean
-  public UserService userService() throws ClassNotFoundException {
-    UserService userService = new UserService();
-    userService.setUserDao(userDao());
-    userService.setDataSource(dataSource());
-    return userService;
+  public UserServiceTx userService() throws ClassNotFoundException {
+    UserServiceTx userServiceTx = new UserServiceTx();
+    userServiceTx.setTransactionManager(transactionManager());
+    userServiceTx.setUserService(userServiceImpl());
+    return userServiceTx;
+  }
+
+  @Bean
+  public UserServiceImpl userServiceImpl() throws ClassNotFoundException {
+    UserServiceImpl userServiceImpl = new UserServiceImpl();
+    userServiceImpl.setUserDao(userDao());
+    userServiceImpl.setMailSender(mailSender());
   }
 
   @Bean

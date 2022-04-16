@@ -3,16 +3,16 @@ package hello.toby.user.service;
 import static hello.toby.user.domain.Level.BASIC;
 import static hello.toby.user.domain.Level.GOLD;
 import static hello.toby.user.domain.Level.SILVER;
-import static hello.toby.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static hello.toby.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
+import static hello.toby.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static hello.toby.user.service.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import hello.toby.user.dao.DaoFactory;
 import hello.toby.user.dao.UserDao;
 import hello.toby.user.domain.User;
-import hello.toby.user.service.UserService.TestUserService;
-import hello.toby.user.service.UserService.TestUserServiceException;
+import hello.toby.user.service.UserServiceImpl.TestUserServiceException;
+import hello.toby.user.service.UserServiceImpl.TestUserServiceImpl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +38,9 @@ public class UserServiceTest {
   UserService userService;
 
   @Autowired
+  UserServiceImpl userServiceImpl;
+
+  @Autowired
   UserDao userDao;
 
   @Autowired
@@ -53,7 +56,7 @@ public class UserServiceTest {
 
   @Test
   void bean() {
-    assertThat(this.userService).isNotNull();
+    assertThat(this.userServiceImpl).isNotNull();
   }
 
   @BeforeEach
@@ -80,9 +83,9 @@ public class UserServiceTest {
     }
 
     MockMailSender mockMailSender = new MockMailSender();
-    userService.setMailSender(mockMailSender);
+    userServiceImpl.setMailSender(mockMailSender);
 
-    userService.upgradeLevels();
+    userServiceImpl.upgradeLevels();
 
     checkLevelUpgraded(users.get(0), false);
     checkLevelUpgraded(users.get(1), true);
@@ -113,8 +116,8 @@ public class UserServiceTest {
     User userWithoutLevel = users.get(0);
     userWithoutLevel.setLevel(null);
 
-    userService.add(userWithLevel);
-    userService.add(userWithoutLevel);
+    userServiceImpl.add(userWithLevel);
+    userServiceImpl.add(userWithoutLevel);
 
     User userWithLevelRead = userDao.get(userWithLevel.getId());
     User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -125,10 +128,14 @@ public class UserServiceTest {
 
   @Test
   void upgradeAllOrNothing() throws Exception {
-    UserService testUserService = new TestUserService(users.get(3).getId());
+    UserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(this.userDao); // userDao를 수동 DI 해준다
-    testUserService.setTransactionManager(transactionManager);
     testUserService.setMailSender(mailSender);
+
+    UserServiceTx txUserService = new UserServiceTx();
+    txUserService.setTransactionManager(transactionManager);
+    txUserService.setUserService(testUserService);
+
     userDao.deleteAll();
     for (User user : users) {
       userDao.add(user);
