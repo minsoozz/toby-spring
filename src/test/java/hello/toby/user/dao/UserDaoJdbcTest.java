@@ -1,17 +1,18 @@
 package hello.toby.user.dao;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import hello.toby.user.domain.Level;
 import hello.toby.user.domain.User;
-import java.sql.SQLException;
-import java.util.List;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UserDaoJdbcTest {
 

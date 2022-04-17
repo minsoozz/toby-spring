@@ -3,9 +3,10 @@ package hello.toby.user.service;
 import hello.toby.user.dao.UserDao;
 import hello.toby.user.domain.Level;
 import hello.toby.user.domain.User;
+import org.springframework.mail.MailSender;
+
 import java.sql.SQLException;
 import java.util.List;
-import org.springframework.mail.MailSender;
 
 public class UserServiceImpl implements UserService {
 

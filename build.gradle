@@ -26,6 +26,9 @@ dependencies {
 	/* javax.mail*/
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	/*mockito*/
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
+
 }
 
 tasks.named('test') {

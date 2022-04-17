@@ -1,10 +1,11 @@
 package hello.toby.user.service;
 
 import hello.toby.user.domain.User;
-import java.sql.SQLException;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import java.sql.SQLException;
 
 public class UserServiceTx implements UserService {
 
