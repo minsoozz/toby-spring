@@ -1,5 +1,6 @@
 package hello.toby.user.service;
 
+import hello.toby.proxy.TransactionHandler;
 import hello.toby.user.dao.DaoFactory;
 import hello.toby.user.dao.UserDao;
 import hello.toby.user.domain.Level;
@@ -11,14 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +58,9 @@ public class UserServiceTest {
     MailSender mailSender;
 
     List<User> users;
+
+    @Autowired
+    ApplicationContext context;
 
     @Test
     void bean() {
@@ -156,14 +163,22 @@ public class UserServiceTest {
     }
 
     @Test
+    @DirtiesContext
     void upgradeAllOrNothing() throws Exception {
         UserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
         testUserService.setUserDao(this.userDao); // userDao를 수동 DI 해준다
         testUserService.setMailSender(mailSender);
 
-        UserServiceTx txUserService = new UserServiceTx();
-        txUserService.setTransactionManager(transactionManager);
-        txUserService.setUserService(testUserService);
+        TransactionHandler txHandler = new TransactionHandler();
+        txHandler.setTarget(testUserService);
+        txHandler.setTransactionManager(transactionManager);
+        txHandler.setPattern("upgradeLevels");
+
+        UserService txUserService = (UserService) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class[]{UserService.class},
+                txHandler
+        );
 
         userDao.deleteAll();
         for (User user : users) {
