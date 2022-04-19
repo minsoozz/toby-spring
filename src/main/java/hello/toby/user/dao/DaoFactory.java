@@ -1,6 +1,9 @@
 package hello.toby.user.dao;
 
 import hello.toby.mail.DummyMailSender;
+import hello.toby.message.MessageFactoryBean;
+import hello.toby.user.service.TxProxyFactoryBean;
+import hello.toby.user.service.UserService;
 import hello.toby.user.service.UserServiceImpl;
 import hello.toby.user.service.UserServiceTx;
 import org.springframework.context.annotation.Bean;
@@ -23,11 +26,13 @@ public class DaoFactory {
     }
 
     @Bean
-    public UserServiceTx userService() throws ClassNotFoundException {
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setTransactionManager(transactionManager());
-        userServiceTx.setUserService(userServiceImpl());
-        return userServiceTx;
+    public TxProxyFactoryBean userService() throws ClassNotFoundException {
+        TxProxyFactoryBean txProxyFactoryBean = new TxProxyFactoryBean();
+        txProxyFactoryBean.setTarget(userServiceImpl());
+        txProxyFactoryBean.setTransactionManager(transactionManager());
+        txProxyFactoryBean.setPattern("upgradeLevels");
+        txProxyFactoryBean.setServiceInterface(Class.forName("hello.toby.user.service.UserService"));
+        return txProxyFactoryBean;
     }
 
     @Bean
@@ -73,5 +78,12 @@ public class DaoFactory {
     @Bean
     public MailSender mailSender() {
         return new DummyMailSender();
+    }
+
+    @Bean
+    public MessageFactoryBean message() {
+        MessageFactoryBean messageFactoryBean = new MessageFactoryBean();
+        messageFactoryBean.setText("Factory Bean");
+        return messageFactoryBean;
     }
 }
