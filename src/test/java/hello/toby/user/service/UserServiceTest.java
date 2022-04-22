@@ -1,7 +1,7 @@
 package hello.toby.user.service;
 
 import hello.toby.proxy.TransactionHandler;
-import hello.toby.user.dao.DaoFactory;
+import hello.toby.config.BeanConfig;
 import hello.toby.user.dao.UserDao;
 import hello.toby.user.domain.Level;
 import hello.toby.user.domain.User;
@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DaoFactory.class)
+@ContextConfiguration(classes = BeanConfig.class)
 public class UserServiceTest {
 
     @Autowired
