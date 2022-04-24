@@ -1,7 +1,11 @@
-package hello.toby.user.dao;
+package hello.toby.config;
 
 import hello.toby.mail.DummyMailSender;
 import hello.toby.message.MessageFactoryBean;
+import hello.toby.user.dao.ConnectionMaker;
+import hello.toby.user.dao.DConnectionMaker;
+import hello.toby.user.dao.JdbcContext;
+import hello.toby.user.dao.UserDaoJdbc;
 import hello.toby.user.service.TxProxyFactoryBean;
 import hello.toby.user.service.UserService;
 import hello.toby.user.service.UserServiceImpl;
@@ -15,7 +19,7 @@ import org.springframework.mail.MailSender;
 import javax.sql.DataSource;
 
 @Configuration
-public class DaoFactory {
+public class BeanConfig {
 
     @Bean
     public UserDaoJdbc userDao() throws ClassNotFoundException {

@@ -1,6 +1,7 @@
 package hello.toby.user.dao;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
+import hello.toby.config.BeanConfig;
 import hello.toby.exception.DuplicateUserIdException;
 import hello.toby.user.domain.Level;
 import hello.toby.user.domain.User;
@@ -143,14 +144,14 @@ public class UserDaoJdbc implements UserDao {
 
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
 
-    DaoFactory factory = new DaoFactory();
+    BeanConfig factory = new BeanConfig();
     UserDaoJdbc dao1 = factory.userDao();
     UserDaoJdbc dao2 = factory.userDao();
 
     System.out.println("dao1 = " + dao1);
     System.out.println("dao2 = " + dao2);
 
-    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+    ApplicationContext context = new AnnotationConfigApplicationContext(BeanConfig.class);
     UserDaoJdbc dao3 = context.getBean("userDao", UserDaoJdbc.class);
     UserDaoJdbc dao4 = context.getBean("userDao", UserDaoJdbc.class);
 

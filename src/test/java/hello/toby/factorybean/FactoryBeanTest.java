@@ -2,7 +2,7 @@ package hello.toby.factorybean;
 
 import hello.toby.message.Message;
 import hello.toby.message.MessageFactoryBean;
-import hello.toby.user.dao.DaoFactory;
+import hello.toby.config.BeanConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DaoFactory.class)
+@ContextConfiguration(classes = BeanConfig.class)
 public class FactoryBeanTest {
 
     @Autowired
